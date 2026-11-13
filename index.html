@@ -1,56 +1,798 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Golys</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      font-family: system-ui, -apple-system, "Microsoft YaHei", sans-serif;
-      background: linear-gradient(135deg, #0f172a, #1e3a8a);
-      color: #fff;
-    }
-    .card {
-      max-width: 680px;
-      padding: 48px 32px;
-      text-align: center;
-    }
-    .tag {
-      color: #93c5fd;
-      letter-spacing: 0.2em;
-      font-size: 14px;
-    }
-    h1 {
-      font-size: clamp(36px, 7vw, 64px);
-      margin: 12px 0 16px;
-    }
-    p {
-      color: #cbd5e1;
-      line-height: 1.8;
-    }
-    a {
-      display: inline-block;
-      margin-top: 24px;
-      padding: 12px 24px;
-      border-radius: 999px;
-      background: #fff;
-      color: #0f172a;
-      text-decoration: none;
-      font-weight: 700;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Golys 的个人主页：学习记录、小游戏与常用工具。">
+<title>Golys · 个人主页</title>
+<style>
+  :root{
+    --ink:#0f172a;
+    --muted:#64748b;
+    --line:#e2e8f0;
+    --blue:#2563eb;
+    --blue-soft:#eff6ff;
+    --card:#ffffff;
+    --radius:26px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    min-height:100vh;
+    color:var(--ink);
+    font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+    background-color:#edf3fb;
+    background-image:
+      linear-gradient(rgba(96,165,250,.09) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(96,165,250,.09) 1px, transparent 1px);
+    background-size:30px 30px;
+    position:relative;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:
+      radial-gradient(700px 420px at 12% 0%, rgba(147,197,253,.42), transparent 68%),
+      radial-gradient(620px 420px at 92% 18%, rgba(196,181,253,.28), transparent 70%);
+    z-index:0;
+  }
+  a{color:inherit}
+  .page{
+    position:relative;
+    z-index:1;
+    width:min(1120px, calc(100% - 40px));
+    margin:48px auto 36px;
+  }
+  .panel{
+    background:rgba(255,255,255,.92);
+    border:1px solid rgba(255,255,255,.9);
+    border-radius:var(--radius);
+    box-shadow:0 30px 80px rgba(30,64,175,.10), 0 2px 8px rgba(15,23,42,.04);
+    backdrop-filter:blur(14px);
+    padding:44px 48px 34px;
+    animation:rise .55s ease both;
+  }
+  @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+  /* ---------- 个人信息 ---------- */
+  .profile{display:flex;align-items:center;gap:30px;padding-bottom:30px;border-bottom:1px solid var(--line)}
+  .avatar{
+    flex:0 0 auto;width:122px;height:122px;border-radius:50%;
+    border:5px solid #fff;background:linear-gradient(135deg,#60a5fa,#a78bfa);
+    box-shadow:0 12px 30px rgba(37,99,235,.22);
+    overflow:hidden;position:relative;
+  }
+  .avatar svg{display:block;width:100%;height:100%}
+  .profile-main{min-width:0}
+  .name-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  h1{font-size:36px;line-height:1.2;margin:0;letter-spacing:-.5px}
+  .status{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:12px;font-weight:600;color:#15803d;background:#f0fdf4;
+    border:1px solid #bbf7d0;border-radius:999px;padding:4px 10px;
+  }
+  .status::before{content:"";width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.14)}
+  .meta{margin:9px 0 0;color:var(--muted);font-size:14px}
+  .bio{margin:10px 0 0;color:#475569;font-size:14px;line-height:1.8}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .tag{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:6px 11px;border-radius:999px;background:var(--blue-soft);
+    border:1px solid #dbeafe;color:#1d4ed8;font-size:12px;font-weight:600;
+  }
+  .tag i{font-style:normal;font-size:13px}
+  .visitors{margin:15px 0 0;color:#94a3b8;font-size:12px}
+
+  /* ---------- 标题 ---------- */
+  .section{margin-top:34px}
+  .section-head{display:flex;align-items:center;gap:11px;margin:0 0 16px}
+  .section-head .bar{width:4px;height:19px;border-radius:4px;background:linear-gradient(#3b82f6,#6366f1)}
+  .section-head h2{font-size:19px;margin:0;letter-spacing:.2px}
+  .section-head .hint{margin-left:auto;color:#b0bccd;font-size:12px}
+
+  /* ---------- 游戏卡片 ---------- */
+  .games{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .game-card{
+    position:relative;display:flex;flex-direction:column;align-items:flex-start;
+    min-height:164px;padding:18px 18px 15px;border-radius:18px;
+    border:1px solid var(--line);background:linear-gradient(180deg,#fff,#f8fbff);
+    cursor:pointer;outline:none;transition:.22s ease;
+    text-decoration:none;
+  }
+  .game-card:hover,.game-card:focus-visible{
+    transform:translateY(-4px);
+    border-color:#bfdbfe;
+    box-shadow:0 14px 30px rgba(37,99,235,.11);
+  }
+  .game-icon{
+    width:40px;height:40px;border-radius:13px;display:grid;place-items:center;
+    font-size:21px;margin-bottom:14px;background:#f0f9ff;
+  }
+  .game-icon.green{background:#ecfdf5}
+  .game-icon.orange{background:#fff7ed}
+  .game-icon.purple{background:#f5f3ff}
+  .game-icon.dark{background:#0f172a}
+  .game-card h3{font-size:15px;margin:0 0 5px}
+  .game-card p{font-size:12px;line-height:1.65;color:var(--muted);margin:0}
+  .game-card .start{
+    margin-top:auto;padding-top:14px;color:var(--blue);font-size:12px;font-weight:700;
+  }
+  .game-card .start span{display:inline-block;transition:transform .2s}
+  .game-card:hover .start span{transform:translateX(3px)}
+  .gh{width:21px;height:21px;fill:#ffffff}
+
+  /* ---------- 工具箱 ---------- */
+  .tabs{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 15px}
+  .tab{
+    border:0;background:transparent;color:#64748b;font:inherit;font-size:13px;font-weight:600;
+    padding:7px 13px;border-radius:10px;cursor:pointer;transition:.18s;
+  }
+  .tab:hover{background:#f1f5f9;color:#334155}
+  .tab.active{background:#0f172a;color:#fff;box-shadow:0 5px 12px rgba(15,23,42,.16)}
+  .tab-panel{display:none;grid-template-columns:repeat(4,1fr);gap:12px}
+  .tab-panel.active{display:grid;animation:fade .22s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+  .tool-card{
+    display:flex;align-items:center;gap:11px;min-width:0;
+    padding:13px 13px;border:1px solid var(--line);border-radius:14px;
+    background:#fff;text-decoration:none;transition:.2s;
+  }
+  .tool-card:hover{border-color:#bfdbfe;background:#f8fbff;transform:translateY(-2px)}
+  .tool-icon{
+    flex:0 0 auto;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+    background:#f1f5f9;font-size:17px;
+  }
+  .tool-copy{min-width:0;display:flex;flex-direction:column;gap:2px}
+  .tool-copy strong{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tool-copy small{font-size:11px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tool-card .arrow{margin-left:auto;color:#cbd5e1;font-size:13px}
+
+  /* ---------- 页脚 ---------- */
+  footer{
+    display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;
+    margin-top:32px;padding-top:18px;border-top:1px solid var(--line);
+    color:#94a3b8;font-size:12px;
+  }
+  footer a{color:#64748b;text-decoration:none}
+  footer a:hover{color:var(--blue)}
+
+  /* ---------- 游戏弹窗 ---------- */
+  .modal{
+    position:fixed;inset:0;z-index:50;display:grid;place-items:center;
+    padding:18px;background:rgba(15,23,42,.66);
+    opacity:0;pointer-events:none;transition:opacity .2s;
+  }
+  .modal.open{opacity:1;pointer-events:auto}
+  .modal-card{
+    width:min(620px,100%);max-height:94vh;overflow:auto;
+    background:#fff;border-radius:24px;padding:22px 24px 20px;
+    box-shadow:0 30px 80px rgba(0,0,0,.35);transform:translateY(10px);transition:.22s;
+  }
+  .modal.open .modal-card{transform:none}
+  .modal-top{display:flex;align-items:flex-start;gap:14px;margin-bottom:12px}
+  .modal-top h2{font-size:19px;margin:0 0 4px}
+  .modal-top p{margin:0;color:var(--muted);font-size:12px;line-height:1.6}
+  .close{
+    margin-left:auto;flex:0 0 auto;width:34px;height:34px;border:0;border-radius:10px;
+    background:#f1f5f9;color:#475569;font-size:20px;line-height:1;cursor:pointer;
+    outline:none;
+  }
+  .close:hover{background:#e2e8f0}
+  .close:focus-visible,.restart:focus-visible,.tab:focus-visible{outline:2px solid #3b82f6;outline-offset:2px}
+  .game-stage{display:flex;justify-content:center;background:#0b1220;border-radius:14px;padding:8px;overflow:auto}
+  canvas{display:block;max-width:100%;height:auto;border-radius:9px;touch-action:manipulation}
+  .game-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}
+  #gameScore{font-size:13px;font-weight:700;color:#334155}
+  .restart{
+    border:0;border-radius:10px;background:var(--blue);color:#fff;
+    font:inherit;font-size:12px;font-weight:700;padding:9px 14px;cursor:pointer;
+  }
+  .restart:hover{background:#1d4ed8}
+
+  @media (max-width:900px){
+    .games{grid-template-columns:repeat(2,1fr)}
+    .tab-panel{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width:620px){
+    .page{width:min(100% - 24px,1120px);margin-top:18px}
+    .panel{padding:26px 20px 22px;border-radius:22px}
+    .profile{align-items:flex-start;gap:17px;flex-wrap:wrap}
+    .avatar{width:84px;height:84px;border-width:4px}
+    h1{font-size:29px}
+    .games{grid-template-columns:1fr 1fr}
+    .game-card{min-height:158px;padding:15px}
+    .tab-panel{grid-template-columns:1fr}
+    .section-head .hint{display:none}
+  }
+  @media (max-width:400px){
+    .games{grid-template-columns:1fr}
+  }
+</style>
 </head>
 <body>
-  <main class="card">
-    <p class="tag">WELCOME TO MY WEBSITE</p>
-    <h1>你好，我是 Golys</h1>
-    <p>这里是我的个人网站，之后我会在这里放上自己的作品、学习记录和联系方式。</p>
-    <a href="mailto:你的邮箱@example.com">联系我</a>
+<div class="page">
+  <main class="panel">
+    <header class="profile">
+      <div class="avatar" aria-hidden="true">
+        <svg viewBox="0 0 120 120" role="img">
+          <defs>
+            <linearGradient id="av" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#60a5fa"/>
+              <stop offset="1" stop-color="#a78bfa"/>
+            </linearGradient>
+          </defs>
+          <rect width="120" height="120" fill="url(#av)"/>
+          <path d="M32 52 L25 27 L47 39 Z" fill="#f8fafc"/>
+          <path d="M88 52 L95 27 L73 39 Z" fill="#f8fafc"/>
+          <path d="M32 52 L28 36 L43 44 Z" fill="#fbcfe8"/>
+          <path d="M88 52 L92 36 L77 44 Z" fill="#fbcfe8"/>
+          <circle cx="60" cy="63" r="31" fill="#fff7ed"/>
+          <circle cx="49" cy="59" r="4.2" fill="#1e293b"/>
+          <circle cx="71" cy="59" r="4.2" fill="#1e293b"/>
+          <circle cx="50.5" cy="57.5" r="1.4" fill="#fff"/>
+          <circle cx="72.5" cy="57.5" r="1.4" fill="#fff"/>
+          <path d="M53 72 Q60 79 67 72" stroke="#1e293b" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <path d="M56 80 Q60 84 64 80" stroke="#fb7185" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+          <circle cx="39" cy="69" r="4" fill="#fda4af" opacity=".55"/>
+          <circle cx="81" cy="69" r="4" fill="#fda4af" opacity=".55"/>
+        </svg>
+      </div>
+      <div class="profile-main">
+        <div class="name-row">
+          <h1>Golys</h1>
+          <span class="status">正在成长</span>
+        </div>
+        <p class="meta">河北工业大学 · 人工智能与数据科学学院</p>
+        <p class="bio">喜欢写代码、玩游戏，也记录一点学习过程。<br>这里是我的数字小窝，欢迎随便逛逛。</p>
+        <div class="tags">
+          <span class="tag"><i>⌨</i> C / C++</span>
+          <span class="tag"><i>🐍</i> Python</span>
+          <span class="tag"><i>✦</i> AI</span>
+          <span class="tag"><i>⛏</i> Minecraft</span>
+          <span class="tag"><i>◐</i> Web</span>
+        </div>
+        <p class="visitors">✨ 感谢每一个路过的人</p>
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="section-head">
+        <span class="bar"></span>
+        <h2>互动 · 游戏</h2>
+        <span class="hint">点开卡片，直接开玩</span>
+      </div>
+      <div class="games">
+        <article class="game-card" data-game="snake" tabindex="0" role="button" aria-label="开始贪吃蛇">
+          <div class="game-icon green">🐍</div>
+          <h3>贪吃蛇</h3>
+          <p>经典方向控制，吃到食物就会变长。</p>
+          <div class="start">开始 <span>→</span></div>
+        </article>
+
+        <article class="game-card" data-game="runner" tabindex="0" role="button" aria-label="开始奔跑游戏">
+          <div class="game-icon orange">🏃</div>
+          <h3>奔跑的哥哥</h3>
+          <p>空格或点击跳跃，躲开迎面而来的障碍。</p>
+          <div class="start">跑酷 <span>→</span></div>
+        </article>
+
+        <article class="game-card" data-game="tetris" tabindex="0" role="button" aria-label="开始俄罗斯方块">
+          <div class="game-icon purple">🧩</div>
+          <h3>俄罗斯方块</h3>
+          <p>移动、旋转、消除，看看你能拿多少分。</p>
+          <div class="start">挑战 <span>→</span></div>
+        </article>
+
+        <a class="game-card" href="https://github.com/dmhs152/golys" target="_blank" rel="noreferrer">
+          <div class="game-icon dark">
+            <svg class="gh" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .7a11.3 11.3 0 0 0-3.6 22c.6.1.8-.2.8-.5v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 1.7 2.7 1.2 3.3.9.1-.7.4-1.2.7-1.5-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.6.8.5A11.3 11.3 0 0 0 12 .7Z"/></svg>
+          </div>
+          <h3>GitHub</h3>
+          <p>源码、作业和一点点折腾记录。</p>
+          <div class="start">访问 <span>↗</span></div>
+        </a>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <span class="bar"></span>
+        <h2>工具箱 · 资源库</h2>
+        <span class="hint">平时常用的网站</span>
+      </div>
+      <div class="tabs" role="tablist" aria-label="资源分类">
+        <button class="tab active" data-tab="dev" role="tab" aria-selected="true">开发</button>
+        <button class="tab" data-tab="design" role="tab" aria-selected="false">设计</button>
+        <button class="tab" data-tab="ai" role="tab" aria-selected="false">AI</button>
+        <button class="tab" data-tab="efficiency" role="tab" aria-selected="false">效率</button>
+        <button class="tab" data-tab="study" role="tab" aria-selected="false">学习</button>
+      </div>
+
+      <div class="tab-panel active" id="tab-dev" role="tabpanel">
+        <a class="tool-card" href="https://developer.mozilla.org/zh-CN/" target="_blank" rel="noreferrer"><span class="tool-icon">📘</span><span class="tool-copy"><strong>MDN Web Docs</strong><small>Web 开发文档</small></span><span class="arrow">↗</span></a>
+        <a class="tool-card" href="https://github.com/" target="_blank" rel="noreferrer"><span class="tool-icon">🐙</span><span class="tool-copy"><strong>GitHub</strong><small>代码与开源</small></span><span class="arrow">↗</span></a>
+        <a class="tool-card" href="https://stackoverflow.com/" target="_blank" rel="noreferrer"><span class="tool-icon">💬</span><span class="tool-copy"><strong>Stack Overflow</strong><small>程序问题问答</small></span><span class="arrow">↗</span></a>
+        <a class="tool-card" href="https://www.runoob.com/" target="_blank" rel="noreferrer"><span class="tool-icon">📗</span><span class="tool-copy"><strong>菜鸟教程</strong><small>中文编程入门</small></span><span class="arrow">↗</span></a>
+      </div>
+
+      <div class="tab-panel" id="tab-design" role="tabpanel">
+        <a class="tool-card" href="https://www.figma.com/" target="_blank" rel="noreferrer"><span class="tool-icon">🎨</span><span class="tool-copy"><strong>Figma</strong><small>界面与原型设计</small></span><span class="arrow">↗</span></a>
+        <a class="tool-card" href="https://coolors.co/" target="_blank" rel="noreferrer"><span class="tool-icon">🌈</span><span class="tool-copy"><strong>Coolors</strong><small>配色方案生成</small></span><span class="arrow">↗</span></a>
+        <a class="tool-card" href="https://unsplash.com/" target="_blank" rel="noreferrer"><span class="tool-icon">📷</span><span class="tool-copy"><strong>Unsplash</strong><small>免费高质量图片</small></span><span class="arrow">↗</span></a>
+        <a class="tool-card" href="https://www.iconfont.cn/" target="_blank" rel="noreferrer"><span class="tool-icon">✳</span><span class="tool-copy"><strong>Iconfont</strong><small>图标素材库</small></span><span class="arrow">↗</span></a>
+      </div>
+
+      <div class="tab-panel" id="tab-ai" role="tabpanel">
+        <a class="tool-card" href="https://chat.deepseek.com/" target="_blank" rel="noreferrer"><span class="tool-icon">🐋</span><span class="tool-copy"><strong>DeepSeek</strong><small>中文 AI 助手</small></span><span class="arrow">↗</span></a>
+        <a class="tool-card" href="https://chatgpt.com/" target="_blank" rel="noreferrer"><span class="tool-icon">✦</span><span class="tool-copy"><strong>ChatGPT</strong><small>OpenAI 助手</small></span><span class="arrow">↗</span></a>
+        <a class="tool-card" href="https://claude.ai/" target="_blank" rel="noreferrer"><span class="tool-icon">🪶</span><span class="tool-copy"><strong>Claude</strong><small>长文本与写作</small></span><span class="arrow">↗</span></a>
+        <a class="tool-card" href="https://kimi.moonshot.cn/" target="_blank" rel="noreferrer"><span class="tool-icon">🌙</span><span class="tool-copy"><strong>Kimi</strong><small>长文档阅读</small></span><span class="arrow">↗</span></a>
+      </div>
+
+      <div class="tab-panel" id="tab-efficiency" role="tabpanel">
+        <a class="tool-card" href="https://www.notion.so/" target="_blank" rel="noreferrer"><span class="tool-icon">📝</span><span class="tool-copy"><strong>Notion</strong><small>笔记与知识库</small></span><span class="arrow">↗</span></a>
+        <a class="tool-card" href="https://excalidraw.com/" target="_blank" rel="noreferrer"><span class="tool-icon">✏</span><span class="tool-copy"><strong>Excalidraw</strong><small>手绘风格白板</small></span><span class="arrow">↗</span></a>
+        <a class="tool-card" href="https://tinypng.com/" target="_blank" rel="noreferrer"><span class="tool-icon">🖼</span><span class="tool-copy"><strong>TinyPNG</strong><small>图片压缩</small></span><span class="arrow">↗</span></a>
+        <a class="tool-card" href="https://cli.im/" target="_blank" rel="noreferrer"><span class="tool-icon">▦</span><span class="tool-copy"><strong>草料二维码</strong><small>二维码生成</small></span><span class="arrow">↗</span></a>
+      </div>
+
+      <div class="tab-panel" id="tab-study" role="tabpanel">
+        <a class="tool-card" href="https://www.bilibili.com/" target="_blank" rel="noreferrer"><span class="tool-icon">📺</span><span class="tool-copy"><strong>Bilibili</strong><small>视频课程与教程</small></span><span class="arrow">↗</span></a>
+        <a class="tool-card" href="https://leetcode.cn/" target="_blank" rel="noreferrer"><span class="tool-icon">⌨</span><span class="tool-copy"><strong>LeetCode</strong><small>算法题库</small></span><span class="arrow">↗</span></a>
+        <a class="tool-card" href="https://www.coursera.org/" target="_blank" rel="noreferrer"><span class="tool-icon">🎓</span><span class="tool-copy"><strong>Coursera</strong><small>大学在线课程</small></span><span class="arrow">↗</span></a>
+        <a class="tool-card" href="https://www.icourse163.org/" target="_blank" rel="noreferrer"><span class="tool-icon">🏫</span><span class="tool-copy"><strong>中国大学 MOOC</strong><small>国内高校课程</small></span><span class="arrow">↗</span></a>
+      </div>
+    </section>
+
+    <footer>
+      <span>© 2026 Golys · 用好奇心维持运行</span>
+      <span><a href="https://github.com/dmhs152/golys" target="_blank" rel="noreferrer">GitHub</a> · <a href="https://dmhs152.github.io/golys/" target="_blank" rel="noreferrer">本站</a></span>
+    </footer>
   </main>
+</div>
+
+<div class="modal" id="gameModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="gameTitle">
+  <div class="modal-card">
+    <div class="modal-top">
+      <div>
+        <h2 id="gameTitle">小游戏</h2>
+        <p id="gameTip">方向键操作</p>
+      </div>
+      <button class="close" id="closeGame" aria-label="关闭游戏">×</button>
+    </div>
+    <div class="game-stage">
+      <canvas id="gameCanvas" width="360" height="360"></canvas>
+    </div>
+    <div class="game-bar">
+      <span id="gameScore">得分 0</span>
+      <button class="restart" id="restartGame">重新开始</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const modal = document.getElementById('gameModal');
+  const modalTitle = document.getElementById('gameTitle');
+  const modalTip = document.getElementById('gameTip');
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const scoreEl = document.getElementById('gameScore');
+  const restartBtn = document.getElementById('restartGame');
+  const closeBtn = document.getElementById('closeGame');
+  let activeGame = null;
+
+  const rr = (x, y, w, h, r) => {
+    const radius = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.arcTo(x + w, y, x + w, y + h, radius);
+    ctx.arcTo(x + w, y + h, x, y + h, radius);
+    ctx.arcTo(x, y + h, x, y, radius);
+    ctx.arcTo(x, y, x + w, y, radius);
+    ctx.closePath();
+  };
+
+  /* ---------------- 贪吃蛇 ---------------- */
+  const snakeGame = {
+    name: '贪吃蛇',
+    tip: '方向键 / WASD 移动，吃到食物得 10 分',
+    width: 360,
+    height: 360,
+    start() {
+      clearInterval(this.timer);
+      this.grid = 20;
+      this.cell = 18;
+      this.snake = [{ x: 9, y: 10 }, { x: 8, y: 10 }, { x: 7, y: 10 }];
+      this.dir = { x: 1, y: 0 };
+      this.nextDir = { x: 1, y: 0 };
+      this.score = 0;
+      this.over = false;
+      this.placeFood();
+      this.setScore();
+      this.draw();
+      this.timer = setInterval(() => this.step(), 110);
+    },
+    stop() { clearInterval(this.timer); },
+    placeFood() {
+      let p;
+      do {
+        p = { x: Math.floor(Math.random() * this.grid), y: Math.floor(Math.random() * this.grid) };
+      } while (this.snake.some(s => s.x === p.x && s.y === p.y));
+      this.food = p;
+    },
+    key(e) {
+      if (this.over) return;
+      const k = e.key.toLowerCase();
+      if ((k === 'arrowup' || k === 'w') && this.dir.y !== 1) this.nextDir = { x: 0, y: -1 };
+      else if ((k === 'arrowdown' || k === 's') && this.dir.y !== -1) this.nextDir = { x: 0, y: 1 };
+      else if ((k === 'arrowleft' || k === 'a') && this.dir.x !== 1) this.nextDir = { x: -1, y: 0 };
+      else if ((k === 'arrowright' || k === 'd') && this.dir.x !== -1) this.nextDir = { x: 1, y: 0 };
+    },
+    step() {
+      this.dir = this.nextDir;
+      const head = { x: this.snake[0].x + this.dir.x, y: this.snake[0].y + this.dir.y };
+      const hitWall = head.x < 0 || head.y < 0 || head.x >= this.grid || head.y >= this.grid;
+      const hitSelf = this.snake.some(s => s.x === head.x && s.y === head.y);
+      if (hitWall || hitSelf) {
+        this.over = true;
+        clearInterval(this.timer);
+        this.draw();
+        return;
+      }
+      const ate = head.x === this.food.x && head.y === this.food.y;
+      this.snake.unshift(head);
+      if (ate) {
+        this.score += 10;
+        this.setScore();
+        this.placeFood();
+      } else {
+        this.snake.pop();
+      }
+      this.draw();
+    },
+    setScore() { scoreEl.textContent = '得分 ' + this.score; },
+    draw() {
+      const S = this.cell, N = this.grid;
+      ctx.fillStyle = '#0b1220';
+      ctx.fillRect(0, 0, this.width, this.height);
+      ctx.strokeStyle = 'rgba(148,163,184,.08)';
+      ctx.lineWidth = 1;
+      for (let i = 1; i < N; i++) {
+        ctx.beginPath(); ctx.moveTo(i * S, 0); ctx.lineTo(i * S, this.height); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, i * S); ctx.lineTo(this.width, i * S); ctx.stroke();
+      }
+      ctx.fillStyle = '#fb7185';
+      ctx.beginPath();
+      ctx.arc(this.food.x * S + S / 2, this.food.y * S + S / 2, S * .32, 0, Math.PI * 2);
+      ctx.fill();
+      this.snake.forEach((s, i) => {
+        ctx.fillStyle = i === 0 ? '#7dd3fc' : '#38bdf8';
+        rr(s.x * S + 2, s.y * S + 2, S - 4, S - 4, 5);
+        ctx.fill();
+      });
+      if (this.over) {
+        ctx.fillStyle = 'rgba(2,6,23,.72)';
+        ctx.fillRect(0, 0, this.width, this.height);
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        ctx.font = '700 26px "Microsoft YaHei", sans-serif';
+        ctx.fillText('游戏结束', this.width / 2, this.height / 2 - 6);
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = '13px "Microsoft YaHei", sans-serif';
+        ctx.fillText('点击下方「重新开始」再来一局', this.width / 2, this.height / 2 + 26);
+      }
+    }
+  };
+
+  /* ---------------- 奔跑 ---------------- */
+  const runnerGame = {
+    name: '奔跑的哥哥',
+    tip: '空格 / 点击画面跳跃，躲开障碍物',
+    width: 520,
+    height: 260,
+    start() {
+      cancelAnimationFrame(this.raf);
+      this.state = { x: 68, y: 210 - 42, w: 30, h: 42, vy: 0, obs: [], score: 0, over: false, spawn: 55, last: 0, ground: 210 };
+      this.setScore();
+      this.raf = requestAnimationFrame(t => this.loop(t));
+    },
+    stop() { cancelAnimationFrame(this.raf); },
+    jump() {
+      const s = this.state;
+      if (!s || s.over) return;
+      if (s.y + s.h >= s.ground - 1) s.vy = -10.8;
+    },
+    click() { this.jump(); },
+    key(e) {
+      if (e.key === ' ' || e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') this.jump();
+    },
+    setScore() { scoreEl.textContent = '得分 ' + Math.floor(this.state ? this.state.score : 0); },
+    loop(t) {
+      const s = this.state;
+      if (!s) return;
+      if (!s.last) s.last = t;
+      const dt = Math.min(2.2, (t - s.last) / 16.67);
+      s.last = t;
+      if (!s.over) {
+        s.vy += .62 * dt;
+        s.y += s.vy * dt;
+        if (s.y + s.h >= s.ground) { s.y = s.ground - s.h; s.vy = 0; }
+        s.spawn -= dt;
+        if (s.spawn <= 0) {
+          const h = 26 + Math.random() * 26;
+          s.obs.push({ x: this.width, w: 18 + Math.random() * 16, h, color: Math.random() > .5 ? '#fb7185' : '#f59e0b' });
+          s.spawn = 62 + Math.random() * 55;
+        }
+        s.obs.forEach(o => o.x -= 5.2 * dt);
+        s.obs = s.obs.filter(o => o.x + o.w > -8);
+        s.score += .12 * dt;
+        for (const o of s.obs) {
+          const oy = s.ground - o.h;
+          if (s.x + s.w > o.x + 2 && s.x < o.x + o.w - 2 && s.y + s.h > oy + 2) {
+            s.over = true;
+            break;
+          }
+        }
+        this.setScore();
+      }
+      this.draw();
+      if (!s.over) this.raf = requestAnimationFrame(tt => this.loop(tt));
+    },
+    draw() {
+      const s = this.state, W = this.width, H = this.height;
+      const sky = ctx.createLinearGradient(0, 0, 0, H);
+      sky.addColorStop(0, '#0f172a');
+      sky.addColorStop(.62, '#172554');
+      sky.addColorStop(1, '#1e3a8a');
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = 'rgba(253,224,71,.72)';
+      ctx.beginPath(); ctx.arc(430, 62, 24, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(30,64,175,.62)';
+      ctx.beginPath();
+      ctx.moveTo(0, 178); ctx.quadraticCurveTo(110, 112, 220, 178);
+      ctx.quadraticCurveTo(330, 128, 520, 178); ctx.lineTo(520, H); ctx.lineTo(0, H); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#0b1220';
+      ctx.fillRect(0, s.ground, W, H - s.ground);
+      ctx.strokeStyle = 'rgba(148,163,184,.24)';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(0, s.ground + 1); ctx.lineTo(W, s.ground + 1); ctx.stroke();
+      ctx.strokeStyle = 'rgba(148,163,184,.12)';
+      for (let x = 20; x < W; x += 46) {
+        ctx.beginPath(); ctx.moveTo(x, s.ground + 18); ctx.lineTo(x + 18, s.ground + 18); ctx.stroke();
+      }
+      s.obs.forEach(o => {
+        ctx.fillStyle = o.color;
+        rr(o.x, s.ground - o.h, o.w, o.h, 5);
+        ctx.fill();
+      });
+      ctx.fillStyle = '#38bdf8';
+      rr(s.x, s.y, s.w, s.h, 8);
+      ctx.fill();
+      ctx.fillStyle = '#e0f2fe';
+      ctx.beginPath(); ctx.arc(s.x + s.w / 2, s.y + 11, 7, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath(); ctx.arc(s.x + s.w / 2 + 3, s.y + 10, 1.8, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#1d4ed8';
+      ctx.fillRect(s.x + 5, s.y + 22, 7, 15);
+      ctx.fillRect(s.x + s.w - 12, s.y + 22, 7, 15);
+      if (s.over) {
+        ctx.fillStyle = 'rgba(2,6,23,.68)';
+        ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        ctx.font = '700 28px "Microsoft YaHei", sans-serif';
+        ctx.fillText('撞到了！', W / 2, H / 2 - 8);
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = '13px "Microsoft YaHei", sans-serif';
+        ctx.fillText('点击「重新开始」再来一次', W / 2, H / 2 + 24);
+      }
+    }
+  };
+
+  /* ---------------- 俄罗斯方块 ---------------- */
+  const tetrisGame = {
+    name: '俄罗斯方块',
+    tip: '← → 移动，↑ 旋转，↓ 加速，空格直接落下',
+    width: 240,
+    height: 480,
+    pieces: [
+      { s: [[1,1,1,1]], c: '#38bdf8' },
+      { s: [[1,1],[1,1]], c: '#fbbf24' },
+      { s: [[0,1,0],[1,1,1]], c: '#a78bfa' },
+      { s: [[1,0,0],[1,1,1]], c: '#60a5fa' },
+      { s: [[0,0,1],[1,1,1]], c: '#fb923c' },
+      { s: [[0,1,1],[1,1,0]], c: '#34d399' },
+      { s: [[1,1,0],[0,1,1]], c: '#fb7185' }
+    ],
+    start() {
+      clearInterval(this.timer);
+      this.cols = 10;
+      this.rows = 20;
+      this.cell = 24;
+      this.board = Array.from({ length: this.rows }, () => Array(this.cols).fill(null));
+      this.score = 0;
+      this.over = false;
+      this.piece = null;
+      this.newPiece();
+      this.setScore();
+      this.draw();
+      this.timer = setInterval(() => this.tick(), 620);
+    },
+    stop() { clearInterval(this.timer); },
+    newPiece() {
+      const p = this.pieces[Math.floor(Math.random() * this.pieces.length)];
+      this.piece = {
+        shape: p.s.map(r => r.slice()),
+        color: p.c,
+        x: Math.floor((this.cols - p.s[0].length) / 2),
+        y: 0
+      };
+      if (this.collide(0, 0)) {
+        this.over = true;
+        clearInterval(this.timer);
+        this.draw();
+      }
+    },
+    collide(dx, dy, shape) {
+      const p = this.piece;
+      const s = shape || p.shape;
+      for (let y = 0; y < s.length; y++) {
+        for (let x = 0; x < s[y].length; x++) {
+          if (!s[y][x]) continue;
+          const nx = p.x + x + dx, ny = p.y + y + dy;
+          if (nx < 0 || nx >= this.cols || ny >= this.rows) return true;
+          if (ny >= 0 && this.board[ny][nx]) return true;
+        }
+      }
+      return false;
+    },
+    tick() {
+      if (this.over) return;
+      if (!this.collide(0, 1)) this.piece.y++;
+      else this.lock();
+      this.draw();
+    },
+    lock() {
+      const p = this.piece;
+      p.shape.forEach((row, y) => row.forEach((v, x) => {
+        if (v && p.y + y >= 0) this.board[p.y + y][p.x + x] = p.color;
+      }));
+      let lines = 0;
+      this.board = this.board.filter(row => {
+        if (row.every(Boolean)) { lines++; return false; }
+        return true;
+      });
+      while (this.board.length < this.rows) this.board.unshift(Array(this.cols).fill(null));
+      if (lines) {
+        this.score += lines * 100;
+        this.setScore();
+      }
+      this.newPiece();
+    },
+    rotate() {
+      if (this.over) return;
+      const old = this.piece.shape;
+      const rotated = old[0].map((_, i) => old.map(row => row[i]).reverse());
+      if (!this.collide(0, 0, rotated)) this.piece.shape = rotated;
+      this.draw();
+    },
+    hardDrop() {
+      if (this.over) return;
+      while (!this.collide(0, 1)) this.piece.y++;
+      this.lock();
+      this.draw();
+    },
+    key(e) {
+      if (this.over) return;
+      if (e.key === 'ArrowLeft') { if (!this.collide(-1, 0)) this.piece.x--; }
+      else if (e.key === 'ArrowRight') { if (!this.collide(1, 0)) this.piece.x++; }
+      else if (e.key === 'ArrowDown') { if (!this.collide(0, 1)) this.piece.y++; }
+      else if (e.key === 'ArrowUp') { this.rotate(); return; }
+      else if (e.key === ' ') { this.hardDrop(); return; }
+      this.draw();
+    },
+    setScore() { scoreEl.textContent = '得分 ' + this.score; },
+    draw() {
+      const S = this.cell, W = this.width, H = this.height;
+      ctx.fillStyle = '#0b1220';
+      ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = 'rgba(148,163,184,.09)';
+      for (let x = 1; x < this.cols; x++) {
+        ctx.beginPath(); ctx.moveTo(x * S, 0); ctx.lineTo(x * S, H); ctx.stroke();
+      }
+      for (let y = 1; y < this.rows; y++) {
+        ctx.beginPath(); ctx.moveTo(0, y * S); ctx.lineTo(W, y * S); ctx.stroke();
+      }
+      const block = (x, y, color) => {
+        ctx.fillStyle = color;
+        rr(x * S + 1, y * S + 1, S - 2, S - 2, 4);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,.18)';
+        ctx.fillRect(x * S + 4, y * S + 4, S - 8, 4);
+      };
+      this.board.forEach((row, y) => row.forEach((c, x) => { if (c) block(x, y, c); }));
+      if (this.piece && !this.over) {
+        const p = this.piece;
+        p.shape.forEach((row, y) => row.forEach((v, x) => {
+          if (v) block(p.x + x, p.y + y, p.color);
+        }));
+      }
+      if (this.over) {
+        ctx.fillStyle = 'rgba(2,6,23,.72)';
+        ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        ctx.font = '700 24px "Microsoft YaHei", sans-serif';
+        ctx.fillText('游戏结束', W / 2, H / 2 - 4);
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = '12px "Microsoft YaHei", sans-serif';
+        ctx.fillText('点击「重新开始」再来一局', W / 2, H / 2 + 24);
+      }
+    }
+  };
+
+  const games = { snake: snakeGame, runner: runnerGame, tetris: tetrisGame };
+
+  function openGame(game) {
+    if (activeGame) activeGame.stop();
+    activeGame = game;
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    modalTitle.textContent = game.name;
+    modalTip.textContent = game.tip;
+    canvas.width = game.width;
+    canvas.height = game.height;
+    scoreEl.textContent = '得分 0';
+    game.start();
+  }
+
+  function closeGame() {
+    if (activeGame) { activeGame.stop(); activeGame = null; }
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+  }
+
+  document.querySelectorAll('[data-game]').forEach(card => {
+    const open = () => openGame(games[card.dataset.game]);
+    card.addEventListener('click', open);
+    card.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+    });
+  });
+
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => {
+        t.classList.toggle('active', t === tab);
+        t.setAttribute('aria-selected', t === tab ? 'true' : 'false');
+      });
+      document.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.toggle('active', panel.id === 'tab-' + tab.dataset.tab);
+      });
+    });
+  });
+
+  canvas.addEventListener('click', () => {
+    if (activeGame && activeGame.click) activeGame.click();
+  });
+
+  restartBtn.addEventListener('click', () => { if (activeGame) activeGame.start(); });
+  closeBtn.addEventListener('click', closeGame);
+  modal.addEventListener('click', e => { if (e.target === modal) closeGame(); });
+
+  document.addEventListener('keydown', e => {
+    if (!activeGame) return;
+    if (e.key === 'Escape') { closeGame(); return; }
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) e.preventDefault();
+    activeGame.key(e);
+  });
+})();
+</script>
 </body>
 </html>
